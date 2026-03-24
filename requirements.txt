@@ -1,0 +1,8 @@
+pydantic
+emoji
+PyMuPDF
+packaging
+mcp
+numpy
+pgvector
+qdrant-client
