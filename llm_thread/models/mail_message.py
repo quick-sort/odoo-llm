@@ -18,7 +18,7 @@ class MailMessage(models.Model):
 
     @api.model
     def _message_fetch(
-        self, domain, search_term=None, before=None, after=None, around=None, limit=30
+        self, domain, thread=None, search_term=None, before=None, after=None, around=None, limit=30
     ):
         """Override to filter only LLM messages for llm.thread model.
 
@@ -41,7 +41,7 @@ class MailMessage(models.Model):
             domain = expression.AND([domain, llm_role_filter])
 
         # Call parent method with modified domain
-        return super()._message_fetch(domain, search_term, before, after, around, limit)
+        return super()._message_fetch(domain, thread=thread, search_term=search_term, before=before, after=after, around=around, limit=limit)
 
     def _extras_to_store(self, store, format_reply):
         """Add LLM-specific fields to the message store."""

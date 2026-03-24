@@ -55,7 +55,7 @@ export const llmStoreService = {
       // LLM-specific methods using standard fetchData approach
       async ensureThreadLoaded(threadId) {
         // Check if thread already exists in mailStore
-        const thread = mailStore.Thread.get({
+        let thread = mailStore.Thread.get({
           model: "llm.thread",
           id: threadId,
         });
@@ -63,9 +63,29 @@ export const llmStoreService = {
           return thread;
         }
 
-        // If thread not found, it might not be accessible to current user
-        // or wasn't loaded in init_messaging (e.g., old thread, different user)
-        console.warn(`Thread ${threadId} not found in mailStore`);
+        // Thread not in store - fetch it from server
+        const threadData = await orm.read("llm.thread", [threadId], [
+          "id",
+          "name",
+          "provider_id",
+          "model_id",
+          "model",
+          "res_id",
+          "tool_ids",
+        ]);
+
+        if (threadData && threadData.length > 0) {
+          // Insert into mailStore and return
+          mailStore.insert({ "llm.thread": threadData }, { html: true });
+          thread = mailStore.Thread.get({
+            model: "llm.thread",
+            id: threadId,
+          });
+          return thread;
+        }
+
+        // Thread not accessible to current user
+        console.warn(`Thread ${threadId} not found or not accessible`);
         return null;
       },
 
@@ -211,7 +231,7 @@ export const llmStoreService = {
           const models = await orm.searchRead(
             "llm.model",
             [["active", "=", true]],
-            ["id", "name", "provider_id", "default", "model_use"]
+            ["id", "name", "provider_id", "is_default", "model_use"]
           );
 
           models.forEach((model) => {
@@ -344,14 +364,21 @@ export const llmStoreService = {
 
       // Refresh threads and select specific thread
       async refreshThreadsAndSelect(threadId) {
-        // Use proper fetchData to refresh thread data
-        // Will trigger proper reload of all threads
-        await mailStore.fetchData({
-          init_messaging: {},
-        });
+        // In Odoo 19, fetch the newly created thread and insert it into mailStore
+        const threadData = await orm.read("llm.thread", [threadId], [
+          "id",
+          "name",
+          "provider_id",
+          "model_id",
+          "model",
+          "res_id",
+          "tool_ids",
+        ]);
 
-        // Wait a moment for threads to be populated
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (threadData && threadData.length > 0) {
+          // Insert the new thread into mailStore
+          mailStore.insert({ "llm.thread": threadData }, { html: true });
+        }
 
         // Select the newly created thread
         await this.selectThread(threadId);
