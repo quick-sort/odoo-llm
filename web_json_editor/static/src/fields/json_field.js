@@ -118,6 +118,11 @@ export class JsonEditorField extends Component {
     // Create editor instance
     this.editor = new JSONEditor(this.editorRef.el, options);
 
+    // Disable Ace worker to prevent loading external worker-json.js
+    if (this.editor.aceEditor) {
+      this.editor.aceEditor.getSession().setUseWorker(false);
+    }
+
     // Set initial value - use record.data like Odoo's standard fields
     let value = this.props.record.data[this.props.name];
 

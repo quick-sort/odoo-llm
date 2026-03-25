@@ -89,7 +89,7 @@
                             <field
                 name="template"
                 widget="ace"
-                options="{'mode': 'text'}"
+                options="{'mode': 'python'}"
                 placeholder="Enter your prompt template here..."
               />
                             <div class="alert alert-info" role="alert">
@@ -198,14 +198,16 @@
                             </div>
                         </page>
                         <page string="Providers" name="providers">
-                            <field
-                name="provider_ids"
-                widget="many2many_tags"
-              />
-                            <field
-                name="publisher_ids"
-                widget="many2many_tags"
-              />
+                            <group>
+                                <field
+                  name="provider_ids"
+                  widget="many2many_tags"
+                />
+                                <field
+                  name="publisher_ids"
+                  widget="many2many_tags"
+                />
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

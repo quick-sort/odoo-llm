@@ -198,7 +198,7 @@
                   name="template"
                   widget="ace"
                   readonly="1"
-                  options="{'mode': 'text'}"
+                  options="{'mode': 'python'}"
                 />
                             </group>
                             <div class="mt-3">

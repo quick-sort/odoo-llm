@@ -109,7 +109,7 @@
                             <field
                 name="rendered_template"
                 widget="ace"
-                options="{'mode': 'text', 'showPrintMargin': false}"
+                options="{'mode': 'python'}"
                 readonly="1"
                 placeholder="Select a record or click 'Evaluate Prompt' to see the rendered template..."
               />
@@ -214,7 +214,7 @@
                                 <field
                   name="original_template"
                   widget="ace"
-                  options="{'mode': 'text', 'showPrintMargin': false}"
+                  options="{'mode': 'python'}"
                   readonly="1"
                   nolabel="1"
                 />

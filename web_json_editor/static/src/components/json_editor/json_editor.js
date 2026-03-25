@@ -97,6 +97,12 @@ export class JsonEditorComponent extends Component {
     // Create editor
     this.editor = new JSONEditor(this.editorRef.el, options);
 
+    // Disable Ace worker to prevent loading external worker-json.js
+    // which is not available in Odoo's asset pipeline.
+    if (this.editor.aceEditor) {
+      this.editor.aceEditor.getSession().setUseWorker(false);
+    }
+
     // Set initial value
     if (this.props.value) {
       this.setValue(this.props.value);
