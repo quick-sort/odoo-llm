@@ -17,31 +17,18 @@ class MailMessage(models.Model):
     )
 
     @api.model
-    def _message_fetch(
-        self, domain, thread=None, search_term=None, before=None, after=None, around=None, limit=30
-    ):
+    def _message_fetch(self, domain, **kwargs):
         """Override to filter only LLM messages for llm.thread model.
 
         For LLM threads, we only want to display messages that have an llm_role
         (user, assistant, tool), not system notifications or other message types
         that would clutter the AI conversation interface.
         """
-        # Check if this is for an llm.thread model
-        is_llm_thread = any(
-            condition[0] == "model"
-            and condition[1] == "="
-            and condition[2] == "llm.thread"
-            for condition in domain
-            if isinstance(condition, (list, tuple)) and len(condition) == 3
-        )
+        thread = kwargs.get("thread")
+        if thread and thread._name == "llm.thread":
+            domain = expression.AND([domain or [], [("llm_role", "!=", False)]])
 
-        if is_llm_thread:
-            # Add LLM role filter for LLM threads - only show messages with llm_role
-            llm_role_filter = [("llm_role", "!=", False)]
-            domain = expression.AND([domain, llm_role_filter])
-
-        # Call parent method with modified domain
-        return super()._message_fetch(domain, thread=thread, search_term=search_term, before=before, after=after, around=around, limit=limit)
+        return super()._message_fetch(domain, **kwargs)
 
     def _extras_to_store(self, store, format_reply):
         """Add LLM-specific fields to the message store."""

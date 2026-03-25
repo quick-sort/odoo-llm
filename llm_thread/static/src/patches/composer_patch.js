@@ -54,7 +54,7 @@ patch(Composer.prototype, {
 
   async sendMessage() {
     if (this.isLLMThread && this.llmStore) {
-      const content = this.props.composer.text?.trim();
+      const content = this.props.composer.composerText?.trim();
       const attachments = this.props.composer.attachments || [];
       const attachmentIds = attachments.map((att) => att.id);
 
@@ -144,12 +144,11 @@ patch(Composer.prototype, {
   /**
    * Disable composer while streaming (LLM only)
    */
-  get isDisabled() {
+  get isSendButtonDisabled() {
     if (this.isLLMThread) {
-      return this.isStreaming || !this.props.composer.text?.trim();
+      return this.isStreaming || !this.props.composer.composerText?.trim();
     }
 
-    // Use original disabled logic for regular mail
-    return super.isDisabled;
+    return super.isSendButtonDisabled;
   },
 });

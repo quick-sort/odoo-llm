@@ -76,7 +76,7 @@ export const llmStoreService = {
 
         if (threadData && threadData.length > 0) {
           // Insert into mailStore and return
-          mailStore.insert({ "llm.thread": threadData }, { html: true });
+          mailStore.insert({ "llm.thread": threadData });
           thread = mailStore.Thread.get({
             model: "llm.thread",
             id: threadId,
@@ -167,12 +167,11 @@ export const llmStoreService = {
           case "message_create": {
             // Handle all messages (user and AI) via EventSource
             mailStore.insert(
-              { "mail.message": [data.message] },
-              { html: true }
+              { "mail.message": [data.message] }
             );
 
             // Get the created message and add it to the thread's messages collection
-            const createdMessage = mailStore.Message.get(data.message.id);
+            const createdMessage = mailStore["mail.message"].get(data.message.id);
 
             // Add message to the correct thread's messages collection (not the active thread)
             const createThread = mailStore.Thread.get({
@@ -191,12 +190,8 @@ export const llmStoreService = {
 
           case "message_chunk":
           case "message_update":
-            // Update existing message using standard mail.store.insert() like Odoo does
-            // Use the same pattern as Odoo's standard bus handlers - always use insert
-            // which will update existing messages or create new ones as needed
             mailStore.insert(
-              { "mail.message": [data.message] },
-              { html: true }
+              { "mail.message": [data.message] }
             );
             break;
 
@@ -377,7 +372,7 @@ export const llmStoreService = {
 
         if (threadData && threadData.length > 0) {
           // Insert the new thread into mailStore
-          mailStore.insert({ "llm.thread": threadData }, { html: true });
+          mailStore.insert({ "llm.thread": threadData });
         }
 
         // Select the newly created thread
