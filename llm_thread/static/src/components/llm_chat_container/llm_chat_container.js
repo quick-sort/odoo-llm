@@ -23,6 +23,7 @@ export class LLMChatContainer extends Component {
     this.llmStore = useState(useService("llm.store"));
     this.mailStore = useState(useService("mail.store"));
     this.action = useService("action");
+    this.orm = useService("orm");
     this.ui = useState(useService("ui")); // Wrap with useState to make it reactive
 
     // Reference to the scrollable thread container for proper jump-to-present behavior
@@ -152,6 +153,28 @@ export class LLMChatContainer extends Component {
   }
 
   /**
+   * Delete a thread
+   * @param {Number} threadId
+   */
+  async deleteThread(threadId) {
+    try {
+      this.llmStore.stopStreaming(threadId);
+      await this.orm.unlink("llm.thread", [threadId]);
+      // If deleted thread was active, clear it
+      if (this.activeThread?.id === threadId && this.mailStore.discuss) {
+        this.mailStore.discuss.thread = undefined;
+      }
+      // Remove from mail store records
+      const thread = this.mailStore.Thread?.get({ model: "llm.thread", id: threadId });
+      if (thread) {
+        thread.delete?.() || delete this.mailStore.Thread.records[thread.localId];
+      }
+    } catch (error) {
+      console.error("Error deleting thread:", error);
+    }
+  }
+
+  /**
    * Create new thread - delegates to llm store service
    * Passes record context if available (e.g., from chatter)
    */
@@ -212,13 +235,22 @@ export class LLMChatContainer extends Component {
       {
         onClose: async () => {
           // Refresh thread data after closing form
-          await this.activeThread.fetchData([
-            "name",
-            "provider_id",
-            "model_id",
-            "tool_ids",
-            "assistant_id",
-          ]);
+          const thread = this.activeThread;
+          const fields = ["name", "provider_id", "model_id", "tool_ids", "assistant_id"];
+          if (thread && typeof thread.fetchData === "function") {
+            await thread.fetchData(fields);
+          } else if (thread) {
+            const data = await this.env.services.orm.read("llm.thread", [thread.id], fields);
+            if (data && data.length) {
+              const raw = data[0];
+              for (const f of ["assistant_id", "provider_id", "model_id", "prompt_id"]) {
+                if (Array.isArray(raw[f])) {
+                  raw[f] = { id: raw[f][0], name: raw[f][1] };
+                }
+              }
+              Object.assign(thread, raw);
+            }
+          }
         },
       }
     );

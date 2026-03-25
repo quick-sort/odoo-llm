@@ -77,14 +77,23 @@ patch(llmStoreService, {
             return;
           }
 
-          // Reuse existing fetchData pattern to refresh thread data
-          await activeThread.fetchData([
-            "assistant_id",
-            "provider_id",
-            "model_id",
-            "tool_ids",
-            "prompt_id",
-          ]);
+          // Refresh thread data - use fetchData if available, otherwise fallback to orm.read
+          const fields = ["assistant_id", "provider_id", "model_id", "tool_ids", "prompt_id"];
+          if (typeof activeThread.fetchData === "function") {
+            await activeThread.fetchData(fields);
+          } else {
+            const data = await orm.read("llm.thread", [activeThread.id], fields);
+            if (data && data.length) {
+              const raw = data[0];
+              // Convert Many2one arrays [id, name] to objects {id, name}
+              for (const f of ["assistant_id", "provider_id", "model_id", "prompt_id"]) {
+                if (Array.isArray(raw[f])) {
+                  raw[f] = { id: raw[f][0], name: raw[f][1] };
+                }
+              }
+              Object.assign(activeThread, raw);
+            }
+          }
         } catch (error) {
           console.error("Error selecting assistant:", error);
           notification.add("Failed to update assistant", { type: "danger" });

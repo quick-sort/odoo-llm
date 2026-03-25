@@ -41,6 +41,28 @@ export class LLMThreadHeader extends Component {
   }
 
   /**
+   * Refresh thread fields - fetchData with fallback for compatibility
+   */
+  async _refreshThread(fields) {
+    const thread = this.activeThread;
+    if (!thread) return;
+    if (typeof thread.fetchData === "function") {
+      await thread.fetchData(fields);
+    } else {
+      const data = await this.orm.read("llm.thread", [thread.id], fields);
+      if (data && data.length) {
+        const raw = data[0];
+        for (const f of ["assistant_id", "provider_id", "model_id", "prompt_id"]) {
+          if (Array.isArray(raw[f])) {
+            raw[f] = { id: raw[f][0], name: raw[f][1] };
+          }
+        }
+        Object.assign(thread, raw);
+      }
+    }
+  }
+
+  /**
    * Check if we have an active LLM thread
    */
   get hasActiveThread() {
@@ -180,7 +202,7 @@ export class LLMThreadHeader extends Component {
       });
 
       // Reload thread data using proper fetchData pattern
-      await this.activeThread.fetchData(["name"]);
+      await this._refreshThread(["name"]);
 
       this.state.isEditingName = false;
       this.state.pendingName = "";
@@ -249,7 +271,7 @@ export class LLMThreadHeader extends Component {
       await this.orm.write("llm.thread", [this.activeThread.id], updateData);
 
       // Reload thread data using proper fetchData pattern
-      await this.activeThread.fetchData(["provider_id", "model_id"]);
+      await this._refreshThread(["provider_id", "model_id"]);
     } catch (error) {
       this.notification.add(
         _t("Could not change the AI provider. Please try again."),
@@ -281,7 +303,7 @@ export class LLMThreadHeader extends Component {
       });
 
       // Reload thread data using proper fetchData pattern
-      await this.activeThread.fetchData(["model_id"]);
+      await this._refreshThread(["model_id"]);
 
       // Clear search
       this.state.modelSearchQuery = "";
@@ -341,7 +363,7 @@ export class LLMThreadHeader extends Component {
       this.activeThread.tool_ids = newToolIds;
 
       // Reload thread data using proper fetchData pattern
-      await this.activeThread.fetchData(["tool_ids"]);
+      await this._refreshThread(["tool_ids"]);
     } catch (error) {
       this.notification.add(
         _t("Could not update the enabled tools. Please try again."),

@@ -73,11 +73,18 @@
                     />
                                     </div>
                                 </div>
-                                <div class="ms-2 flex-shrink-0">
+                                <div class="ms-2 flex-shrink-0 d-flex align-items-center gap-1">
                                     <i
                     t-if="isStreamingThread(thread.id)"
                     class="fa fa-circle-o-notch fa-spin text-primary"
                   />
+                                    <button
+                    class="btn btn-sm btn-link text-danger p-0 opacity-50 opacity-100-hover"
+                    t-on-click.stop="() => this.deleteThread(thread.id)"
+                    title="Delete"
+                  >
+                                        <i class="fa fa-trash-o" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -173,11 +180,18 @@
                     />
                                     </div>
                                 </div>
-                                <div class="ms-2 flex-shrink-0">
+                                <div class="ms-2 flex-shrink-0 d-flex align-items-center gap-1">
                                     <i
                     t-if="isStreamingThread(thread.id)"
                     class="fa fa-circle-o-notch fa-spin text-primary"
                   />
+                                    <button
+                    class="btn btn-sm btn-link text-danger p-0 opacity-50 opacity-100-hover"
+                    t-on-click.stop="() => this.deleteThread(thread.id)"
+                    title="Delete"
+                  >
+                                        <i class="fa fa-trash-o" />
+                                    </button>
                                 </div>
                             </div>
                         </div>

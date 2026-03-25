@@ -2,7 +2,6 @@ import logging
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.osv import expression
 
 _logger = logging.getLogger(__name__)
 
@@ -26,7 +25,7 @@ class MailMessage(models.Model):
         """
         thread = kwargs.get("thread")
         if thread and thread._name == "llm.thread":
-            domain = expression.AND([domain or [], [("llm_role", "!=", False)]])
+            domain = fields.Domain(domain or []) & fields.Domain([("llm_role", "!=", False)])
 
         return super()._message_fetch(domain, **kwargs)
 

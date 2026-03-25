@@ -21,6 +21,7 @@ class AppsMenuPreferences extends Component {
     }
 }
 
+AppsMenuPreferences.props = {};
 AppsMenuPreferences.template = xml`
     <div class="o-dropdown dropdown o-dropdown--no-caret">
         <button
