@@ -78,10 +78,10 @@ export const llmStoreService = {
           // Rename "model" to "res_model" to avoid overwriting Thread's model identifier
           for (const data of threadData) {
             data.res_model = data.model;
-            delete data.model;
+            data.model = "llm.thread";
           }
-          // Insert into mailStore and return
-          mailStore.insert({ "llm.thread": threadData });
+          // Insert into mailStore using "Thread" key (the store's internal model name)
+          mailStore.insert({ Thread: threadData });
           thread = mailStore.Thread.get({
             model: "llm.thread",
             id: threadId,
@@ -379,10 +379,10 @@ export const llmStoreService = {
           // Rename "model" to "res_model" to avoid overwriting Thread's model identifier
           for (const data of threadData) {
             data.res_model = data.model;
-            delete data.model;
+            data.model = "llm.thread";
           }
-          // Insert the new thread into mailStore
-          mailStore.insert({ "llm.thread": threadData });
+          // Insert into mailStore using "Thread" key (the store's internal model name)
+          mailStore.insert({ Thread: threadData });
         }
 
         // Select the newly created thread
