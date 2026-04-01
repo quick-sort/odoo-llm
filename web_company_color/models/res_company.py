@@ -153,6 +153,7 @@ class ResCompany(models.Model):
             --o-cc1-btn-primary-border: %(color_button_bg)s;
             --o-cc2-btn-primary: %(color_button_bg)s;
             --o-cc2-btn-primary-border: %(color_button_bg)s;
+            --primary-bg-subtle: %(color_button_bg_light)s;
             scrollbar-color: %(color_button_bg)s transparent;
         }
         .btn-outline-primary {
