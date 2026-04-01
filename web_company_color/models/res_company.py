@@ -135,6 +135,9 @@ class ResCompany(models.Model):
         .dropdown-item{
             color: %(color_submenu_text)s !important;
         }
+        :root .o_grid_apps_menu {
+            --app-menu-background: url(/web_responsive/static/src/img/home-menu-bg-overlay.svg), linear-gradient(to bottom, %(color_button_bg_light)s, white) !important;
+        }
         .o_loading_indicator {
             background-color: %(color_navbar_bg)s !important;
         }
