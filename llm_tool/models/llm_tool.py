@@ -102,20 +102,14 @@ class LLMTool(models.Model):
         "Set to false to manually manage this tool's configuration.",
     )
 
-    # Odoo 19: _sql_constraints is deprecated but still works
-    # TODO: Migrate to models.Constraint when fully moving to Odoo 19
-    _sql_constraints = [
-        (
-            "unique_function_tool",
-            "UNIQUE(decorator_model, decorator_method)",
-            "A tool for this model and method combination already exists!",
-        ),
-        (
-            "unique_tool_name",
-            "UNIQUE(name)",
-            "A tool with this name already exists! Tool names must be unique.",
-        ),
-    ]
+    _unique_function_tool = models.Constraint(
+        'UNIQUE(decorator_model, decorator_method)',
+        'A tool for this model and method combination already exists!',
+    )
+    _unique_tool_name = models.Constraint(
+        'UNIQUE(name)',
+        'A tool with this name already exists! Tool names must be unique.',
+    )
 
     @api.model
     def _selection_implementation(self):

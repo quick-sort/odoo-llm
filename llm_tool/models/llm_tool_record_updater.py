@@ -17,7 +17,7 @@ class LLMToolRecordUpdater(models.Model):
     def odoo_record_updater_execute(
         self,
         model: str,
-        domain: list[list[Union[str, int, bool, float, None]]],
+        domain: list[Union[str, list[Union[str, int, bool, float, None]]]],
         values: dict[str, Any],
         limit: int = 1,
     ) -> dict[str, Any]:
