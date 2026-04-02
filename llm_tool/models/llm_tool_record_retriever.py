@@ -18,7 +18,7 @@ class LLMToolRecordRetriever(models.Model):
     def odoo_record_retriever_execute(
         self,
         model: str,
-        domain: list[list[Union[str, int, bool, float, None]]] = [],  # noqa: B006
+        domain: list[Union[str, list[Union[str, int, bool, float, None]]]] = [],  # noqa: B006
         fields: list[str] = [],  # noqa: B006
         limit: int = 100,
     ) -> dict[str, Any]:
