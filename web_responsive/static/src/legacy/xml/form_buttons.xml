@@ -53,6 +53,7 @@
         </xpath>
         <xpath expr="//button[hasclass('o_form_button_create')]" position="replace">
             <button
+                t-if="!model.root.isInEdition and canCreate"
                 type="button"
                 class="btn btn-secondary o_form_button_create"
                 data-hotkey="c"
@@ -73,21 +74,9 @@
             position="replace"
         >
             <button
+                t-if="canCreate"
                 type="button"
                 class="btn btn-outline-primary o_form_button_create"
-                data-hotkey="c"
-                t-on-click.stop="create"
-            >
-                <t t-call="web_responsive.icon_button_create" />
-            </button>
-        </xpath>
-        <xpath
-            expr="//button[hasclass('o_form_button_create')][hasclass('btn-outline-primary')]"
-            position="replace"
-        >
-            <button
-                type="button"
-                class="btn btn-secondary o_form_button_create"
                 data-hotkey="c"
                 t-on-click.stop="create"
             >
