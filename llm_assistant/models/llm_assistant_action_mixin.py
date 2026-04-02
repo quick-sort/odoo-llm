@@ -112,7 +112,7 @@ class LLMAssistantActionMixin(models.AbstractModel):
         default_model = self.env["llm.model"].search(
             [
                 ("model_use", "in", ["chat", "multimodal"]),
-                ("default", "=", True),
+                ("is_default", "=", True),
                 ("active", "=", True),
             ],
             limit=1,
