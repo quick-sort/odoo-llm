@@ -6,3 +6,4 @@ mcp
 numpy
 pgvector
 qdrant-client
+markitdown

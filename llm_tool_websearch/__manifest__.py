@@ -11,7 +11,7 @@
     """,
     "depends": ["llm_tool"],
     "external_dependencies": {
-        "python": ["requests", "readabilipy"],
+        "python": ["requests", "markitdown"],
     },
     "data": [
         "data/llm_tool_data.xml",

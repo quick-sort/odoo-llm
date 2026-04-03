@@ -1,12 +1,15 @@
+import io
 import logging
 from typing import Any
 
 import requests
-from readabilipy import simple_json_from_html_string
+from markitdown import MarkItDown
 
 from odoo import api, models
 
 _logger = logging.getLogger(__name__)
+
+_markitdown = MarkItDown()
 
 
 class LLMToolWebSearch(models.Model):
@@ -77,7 +80,6 @@ class LLMToolWebSearch(models.Model):
     def web_fetch_execute(
         self,
         urls: list[str],
-        max_length: int = 20000,
     ) -> dict[str, Any]:
         """
         Fetch one or more web pages and extract their main readable content.
@@ -87,7 +89,6 @@ class LLMToolWebSearch(models.Model):
 
         Parameters:
             urls: List of URLs to fetch.
-            max_length: Maximum character length of returned content per page.
         """
         api_key = (
             self.env["ir.config_parameter"]
@@ -108,7 +109,7 @@ class LLMToolWebSearch(models.Model):
         from concurrent.futures import ThreadPoolExecutor
 
         def fetch_single(url):
-            return self._fetch_url(url, api_key, zone, max_length)
+            return self._fetch_url(url, api_key, zone)
 
         with ThreadPoolExecutor(max_workers=min(len(urls), 8)) as pool:
             results = list(pool.map(fetch_single, urls))
@@ -116,8 +117,9 @@ class LLMToolWebSearch(models.Model):
         return {"results": results}
 
     @api.model
-    def _fetch_url(self, url, api_key, zone, max_length):
+    def _fetch_url(self, url, api_key, zone):
         """Fetch a single URL via BrightData and extract readable content."""
+        html = None
         try:
             resp = requests.post(
                 "https://api.brightdata.com/request",
@@ -126,7 +128,6 @@ class LLMToolWebSearch(models.Model):
                     "url": url,
                     "format": "raw",
                     "method": "GET",
-                    "direct": True,
                 },
                 headers={
                     "Authorization": f"Bearer {api_key}",
@@ -135,7 +136,10 @@ class LLMToolWebSearch(models.Model):
                 timeout=60,
             )
             resp.raise_for_status()
-            html = resp.text
+            brd_err = resp.headers.get('x-brd-err-code')
+            if brd_err:
+                return {"url": url, "error": resp.headers.get('x-brd-err-msg', brd_err)}
+            html = resp.content
         except requests.RequestException as e:
             _logger.exception("BrightData fetch failed for %s", url)
             return {"url": url, "error": str(e)}
@@ -143,13 +147,14 @@ class LLMToolWebSearch(models.Model):
         if not html:
             return {"url": url, "content": ""}
 
-        article = simple_json_from_html_string(html, use_readability=True)
-        content = article.get("content", "") if article else ""
+        try:
+            result = _markitdown.convert_stream(io.BytesIO(html), file_extension=".html")
+            content = result.text_content.strip() if result and result.text_content else ""
+        except Exception:
+            _logger.warning("Failed to parse HTML from %s", url, exc_info=True)
+            content = ""
 
         if not content:
             return {"url": url, "content": ""}
-
-        if len(content) > max_length:
-            content = content[:max_length] + "\n\n... (truncated)"
 
         return {"url": url, "content": content}
