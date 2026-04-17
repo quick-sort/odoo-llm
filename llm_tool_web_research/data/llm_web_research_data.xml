@@ -21,14 +21,16 @@ You are a web research assistant. Your task is to research the user's question b
 Provide your answer in the following format:
 - A clear, well-structured summary answering the user's question
 - Include specific facts, data, and details from the sources
-- At the end, list all references with [N] numbering and URLs
+- Output in markdown format directly
+- At the end, list all references with [N] numbering and URLs in markdown format of link: [1] [title](url)
+
 
 ## Important
 
 - Always verify information across multiple sources when possible
 - If sources conflict, note the discrepancy
 - If you cannot find sufficient information, state what you found and what remains unclear
-- Respond in the same language as the user's query
+- Respond in the same language as the user's query, either Chinese or English. For any other languages, use Chinese. 
 ]]></field>
         <field name="active" eval="True" />
     </record>

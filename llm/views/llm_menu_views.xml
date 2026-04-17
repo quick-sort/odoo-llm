@@ -5,6 +5,7 @@
     id="menu_llm_root"
     name="LLM"
     web_icon="llm,static/description/icon.png"
+    groups="group_llm_user"
     sequence="100"
   />
 

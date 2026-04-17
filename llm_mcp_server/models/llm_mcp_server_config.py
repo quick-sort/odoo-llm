@@ -112,6 +112,12 @@ class LLMMCPServerConfig(models.Model):
         help="Server operation mode",
     )
 
+    tool_domain = fields.Char(
+        string="Tool Filter Domain",
+        default="[('active', '=', True)]",
+        help="Domain filter for tools exposed via MCP. Default exposes all active tools.",
+    )
+
     @api.constrains("active")
     def _check_single_active_record(self):
         """Ensure only one config record can be active at a time"""

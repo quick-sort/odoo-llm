@@ -37,16 +37,7 @@ class WebsearchTest(models.TransientModel):
             self.result = 'Error: web_research tool not found.'
             return
         res = tool.web_research_execute(query=self.query or '')
-        # Find the latest record created by the tool
-        record = self.env['web.research.record'].search([], order='id desc', limit=1)
-        if record:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'web.research.record',
-                'res_id': record.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
+        self.result = res.get('result', 'No result.')
 
     def action_search(self):
         self.ensure_one()

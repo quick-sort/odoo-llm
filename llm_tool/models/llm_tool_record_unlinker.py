@@ -17,7 +17,7 @@ class LLMToolRecordUnlinker(models.Model):
     def odoo_record_unlinker_execute(
         self,
         model: str,
-        domain: list[list[Union[str, int, bool, float, None]]],
+        domain: list[list[Union[str, int, bool, float, None, list[Union[str, int, bool, float, None]]]]],
         limit: int = 1,
     ) -> dict[str, Any]:
         """

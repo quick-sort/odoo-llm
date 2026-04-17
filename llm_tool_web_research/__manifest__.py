@@ -7,7 +7,6 @@
     "data": [
         "security/ir.model.access.csv",
         "data/llm_web_research_data.xml",
-        "views/web_research_record_views.xml",
         "wizard/websearch_test_views.xml",
     ],
     "installable": True,

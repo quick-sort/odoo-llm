@@ -157,4 +157,7 @@ class LLMToolWebSearch(models.Model):
         if not content:
             return {"url": url, "content": ""}
 
+        # Strip null bytes - PostgreSQL jsonb cannot store \u0000
+        content = content.replace('\x00', '')
+
         return {"url": url, "content": content}

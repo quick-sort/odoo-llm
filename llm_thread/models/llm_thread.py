@@ -288,7 +288,7 @@ class LLMThread(models.Model):
         """
         if not body or isinstance(body, Markup):
             return body
-        return markdown2.markdown(emoji.demojize(body))
+        return markdown2.markdown(emoji.demojize(body), extras=["tables"])
 
     # ============================================================================
     # STREAMING MESSAGE CREATION

@@ -29,6 +29,7 @@
                 readonly="1"
               />
                             <field name="mode" />
+                            <field name="tool_domain" />
                         </group>
                         <group>
                             <field

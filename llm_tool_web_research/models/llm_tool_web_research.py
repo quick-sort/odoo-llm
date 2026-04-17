@@ -3,6 +3,7 @@ import logging
 from typing import Any
 
 from odoo import api, models
+from odoo.orm.registry import Registry
 
 _logger = logging.getLogger(__name__)
 
@@ -32,39 +33,45 @@ class LLMToolWebResearch(models.Model):
         Parameters:
             query: The research question or topic to investigate.
         """
-        assistant = self.env['llm.assistant'].get_assistant_by_code('web_researcher')
+        # Run in a separate cursor to avoid savepoint conflicts with the outer
+        # tool-call transaction.  The nested generate() manages its own
+        # savepoints / advisory locks and would otherwise corrupt the caller's
+        # savepoint stack.
+        db_name = self.env.cr.dbname
+        uid = self.env.uid
+        context = self.env.context
+
+        with Registry(db_name).cursor() as cr:
+            env = api.Environment(cr, uid, context)
+            result = self._web_research_in_env(env, query)
+            cr.commit()
+
+        return result
+
+    def _web_research_in_env(self, env, query):
+        """Execute web research in the given environment (separate cursor)."""
+        assistant = env['llm.assistant'].get_assistant_by_code('web_researcher')
         if not assistant:
             return {"error": "Web researcher assistant not found."}
 
-        # Create thread
-        thread = self.env['llm.thread'].create({
+        thread = env['llm.thread'].create({
             'provider_id': assistant.provider_id.id,
             'model_id': assistant.model_id.id,
         })
         thread.set_assistant(assistant.id)
 
-        # Create research record
-        record = self.env['web.research.record'].create({
-            'query': query,
-            'thread_id': thread.id,
-            'state': 'running',
-        })
-
         try:
             for _event in thread.generate(user_message_body=query):
                 pass
 
-            # Get final assistant message
-            message = self.env['mail.message'].search([
+            message = env['mail.message'].search([
                 ('model', '=', 'llm.thread'),
                 ('res_id', '=', thread.id),
                 ('llm_role', '=', 'assistant'),
             ], order='id desc', limit=1)
 
             result = str(message.body) if message else "No result."
-            record.write({'result': result, 'state': 'done'})
         except Exception as e:
-            record.write({'state': 'error', 'error_message': str(e)})
             result = f"Error: {e}"
 
         return {"query": query, "result": result}

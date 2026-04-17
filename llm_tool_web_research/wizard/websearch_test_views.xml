@@ -4,7 +4,7 @@
         <field name="name">llm.websearch.test.form</field>
         <field name="model">llm.websearch.test</field>
         <field name="arch" type="xml">
-            <form string="Web Search Test">
+            <form string="Web Search Config">
                 <sheet>
                     <group string="API Keys">
                         <field name="brave_api_key" password="True"/>
@@ -28,14 +28,14 @@
     </record>
 
     <record id="action_websearch_test" model="ir.actions.act_window">
-        <field name="name">Web Search Test</field>
+        <field name="name">Web Search Config</field>
         <field name="res_model">llm.websearch.test</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
     </record>
 
     <menuitem id="menu_websearch_test"
-              name="Web Search Test"
+              name="Web Search"
               action="action_websearch_test"
               parent="llm.menu_llm_config"
               sequence="50"/>

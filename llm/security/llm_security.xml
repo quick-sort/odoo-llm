@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <!-- Create LLM Manager group (Odoo 19 compatible - no category_id) -->
+    <!-- LLM User group -->
+    <record id="group_llm_user" model="res.groups">
+        <field name="name">LLM User</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+    </record>
+
+    <!-- LLM Manager implies LLM User -->
     <record id="group_llm_manager" model="res.groups">
         <field name="name">LLM Manager</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        <field name="implied_ids" eval="[(4, ref('group_llm_user'))]" />
     </record>
 
     <!-- Make Settings/Admin group imply LLM Manager -->
@@ -21,7 +27,7 @@
         <field name="perm_write" eval="False" />
         <field name="perm_create" eval="False" />
         <field name="perm_unlink" eval="False" />
-        <field name="groups" eval="[(4, ref('base.group_user'))]" />
+        <field name="groups" eval="[(4, ref('group_llm_user'))]" />
     </record>
 
     <record id="llm_provider_rule_manager" model="ir.rule">
@@ -44,7 +50,7 @@
         <field name="perm_write" eval="False" />
         <field name="perm_create" eval="False" />
         <field name="perm_unlink" eval="False" />
-        <field name="groups" eval="[(4, ref('base.group_user'))]" />
+        <field name="groups" eval="[(4, ref('group_llm_user'))]" />
     </record>
 
     <record id="llm_model_rule_manager" model="ir.rule">

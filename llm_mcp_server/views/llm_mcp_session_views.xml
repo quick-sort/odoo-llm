@@ -41,10 +41,10 @@
                         <page string="Client Information" name="client_info">
                             <group>
                                 <field name="protocol_version" />
-                                <field name="client_info" widget="jsonb" />
+                                <field name="client_info" widget="json_editor" />
                                 <field
                   name="client_capabilities"
-                  widget="jsonb"
+                  widget="json_editor"
                 />
                             </group>
                         </page>
